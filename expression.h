@@ -202,6 +202,7 @@ struct expression {
 		struct /* deref_arg */ {
 			struct expression *deref;
 			struct ident *member;
+			struct position m_pos;
 		};
 		// EXPR_SLICE
 		struct /* slice */ {

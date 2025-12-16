@@ -454,7 +454,7 @@ again:
 			p_mode = U_R_VAL;
 		p_type = do_expression(p_mode, expr->deref);
 
-		ret = report_member(mode, &expr->pos, p_type,
+		ret = report_member(mode, &expr->m_pos, p_type,
 			lookup_member(p_type, expr->member, NULL));
 	}
 

@@ -605,6 +605,7 @@ static struct token *postfix_expression(struct token *token, struct expression *
 				break;
 			}
 			deref->member = token->ident;
+			deref->m_pos = token->pos;
 			token = token->next;
 			expr = deref;
 			continue;

@@ -149,7 +149,7 @@ INST_PROGRAMS+=c2xml
 c2xml-ldlibs := $(shell $(PKG_CONFIG) --libs libxml-2.0)
 c2xml-cflags := $(shell $(PKG_CONFIG) --cflags libxml-2.0)
 else
-$(warning Your system does not have libxml, disabling c2xml)
+#$(warning Your system does not have libxml, disabling c2xml)
 endif
 
 HAVE_SQLITE := $(shell $(PKG_CONFIG) --exists sqlite3 2>/dev/null && echo 'yes')
@@ -189,7 +189,7 @@ EXTRA_OBJS += ast-model.o ast-view.o ast-inspect.o
 PROGRAMS += test-inspect
 INST_PROGRAMS += test-inspect
 else
-$(warning Your system does not have gtk3/gtk2, disabling test-inspect)
+#$(warning Your system does not have gtk3/gtk2, disabling test-inspect)
 endif
 
 # Can we use LLVM (needed for ... sparse-llvm)?
@@ -226,7 +226,7 @@ else
 $(warning sparse-llvm disabled on ${arch})
 endif
 else
-$(warning Your system does not have llvm, disabling sparse-llvm)
+#$(warning Your system does not have llvm, disabling sparse-llvm)
 endif
 
 ifeq ($(HAVE_BOOLECTOR),yes)

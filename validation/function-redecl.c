@@ -56,14 +56,14 @@ function-redecl.c:9:11: error: symbol 'ret_const' redeclared with different type
 function-redecl.c:9:11:    int extern const [addressable] [signed] [toplevel] ret_const( ... )
 function-redecl.c:8:5: note: previously declared as:
 function-redecl.c:8:5:    int extern [addressable] [signed] [toplevel] ret_const( ... )
-function-redecl.c:13:13: error: symbol 'ret_as' redeclared with different type (different address spaces):
-function-redecl.c:13:13:    void <asn:1> *extern [addressable] [toplevel] ret_as( ... )
-function-redecl.c:12:6: note: previously declared as:
-function-redecl.c:12:6:    void *extern [addressable] [toplevel] ret_as( ... )
-function-redecl.c:17:12: error: symbol 'ret_mod' redeclared with different type (different modifiers):
-function-redecl.c:17:12:    void const *extern [addressable] [toplevel] ret_mod( ... )
-function-redecl.c:16:6: note: previously declared as:
-function-redecl.c:16:6:    void *extern [addressable] [toplevel] ret_mod( ... )
+function-redecl.c:13:14: error: symbol 'ret_as' redeclared with different type (different address spaces):
+function-redecl.c:13:14:    void <asn:1> *extern [addressable] [toplevel] ret_as( ... )
+function-redecl.c:12:7: note: previously declared as:
+function-redecl.c:12:7:    void *extern [addressable] [toplevel] ret_as( ... )
+function-redecl.c:17:13: error: symbol 'ret_mod' redeclared with different type (different modifiers):
+function-redecl.c:17:13:    void const *extern [addressable] [toplevel] ret_mod( ... )
+function-redecl.c:16:7: note: previously declared as:
+function-redecl.c:16:7:    void *extern [addressable] [toplevel] ret_mod( ... )
 function-redecl.c:21:6: error: symbol 'arg_type' redeclared with different type (incompatible argument 1 (different base types)):
 function-redecl.c:21:6:    void extern [addressable] [toplevel] arg_type( ... )
 function-redecl.c:20:6: note: previously declared as:

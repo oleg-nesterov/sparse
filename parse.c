@@ -1821,6 +1821,8 @@ static struct token *direct_declarator(struct token *token, struct decl_state *c
 
 	if (ctx->ident && token_type(token) == TOKEN_IDENT) {
 		*ctx->ident = token->ident;
+		if (ctx->d_pos)
+			*ctx->d_pos = token->pos;
 		token = token->next;
 	} else if (match_op(token, '(') &&
 	    is_nested(token, &next, ctx->prefer_abstract)) {
@@ -1945,6 +1947,7 @@ static struct token *declaration_list(struct token *token, struct symbol_list **
 		struct symbol *decl = alloc_symbol(token->pos, SYM_NODE);
 		ctx.cleanup = NULL;
 		ctx.ident = &decl->ident;
+		ctx.d_pos = &decl->pos;
 
 		token = declarator(token, &ctx);
 		if (match_op(token, ':'))
@@ -2963,6 +2966,7 @@ struct token *external_declaration(struct token *token, struct symbol_list **lis
 	}
 
 	saved = ctx.ctype;
+	ctx.d_pos = &decl->pos;
 	token = declarator(token, &ctx);
 	token = handle_asm_name(token, &ctx);
 	token = handle_attributes(token, &ctx);
@@ -3089,6 +3093,7 @@ struct token *external_declaration(struct token *token, struct symbol_list **lis
 		decl = alloc_symbol(token->pos, SYM_NODE);
 		ctx.ctype = saved;
 		ctx.cleanup = NULL;
+		ctx.d_pos = &decl->pos;
 		token = handle_attributes(token, &ctx);
 		token = declarator(token, &ctx);
 		token = handle_asm_name(token, &ctx);

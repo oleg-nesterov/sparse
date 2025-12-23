@@ -59,6 +59,7 @@ static void do_sym_list(struct symbol_list *list);
 
 static struct symbol
 	*base_type(struct symbol *sym),
+	*do_symbol(struct symbol *sym),
 	*do_initializer(struct symbol *type, struct expression *expr),
 	*do_expression(usage_t mode, struct expression *expr),
 	*do_statement(usage_t mode, struct statement *stmt);
@@ -225,6 +226,12 @@ static void examine_sym_node(struct symbol *node, struct symbol *parent)
 
 		case SYM_FN:
 			node->kind = 'f';
+			if (node->ctype.modifiers & MOD_INLINE) {
+				struct symbol *dctx = dissect_ctx;
+				dissect_ctx = NULL;
+				do_symbol(node);
+				dissect_ctx = dctx;
+			}
 			node = base;
 			break;
 
@@ -621,7 +628,7 @@ static inline bool is_typedef(struct symbol *sym)
 	return (sym->namespace == NS_TYPEDEF);
 }
 
-static inline struct symbol *do_symbol(struct symbol *sym)
+static struct symbol *do_symbol(struct symbol *sym)
 {
 	struct symbol *type = base_type(sym);
 	struct symbol *dctx = dissect_ctx;

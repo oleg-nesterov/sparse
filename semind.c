@@ -298,7 +298,7 @@ static void parse_cmdline_add(int argc, char **argv)
 		{ "help", no_argument, NULL, 'h' },
 		{ NULL }
 	};
-	int c;
+	int parsed = optind, c;
 
 	opterr = 0;
 
@@ -315,6 +315,7 @@ static void parse_cmdline_add(int argc, char **argv)
 			case '?':
 				goto done;
 		}
+		parsed = optind;
 	}
 done:
 	if (optind == argc) {
@@ -326,9 +327,8 @@ done:
 	tabstop = 1;
 
 	// step back since sparse_initialize will ignore argv[0].
-	optind--;
-
-	sparse_initialize(argc - optind, argv + optind, &semind_filelist);
+	parsed--;
+	sparse_initialize(argc - parsed, argv + parsed, &semind_filelist);
 	dissect_show_all_symbols = 1;
 }
 

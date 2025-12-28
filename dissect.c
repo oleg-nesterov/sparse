@@ -668,14 +668,10 @@ static inline bool valid_namespace(enum namespace ns)
 	return (ns == NS_TYPEDEF || ns == NS_MACRO || ns == NS_UNDEF || ns == NS_STRUCT || ns == NS_SYMBOL);
 }
 
-static void do_file(char *file)
+static void do_file(struct symbol_list *res)
 {
-	struct symbol_list *res = sparse_keep_tokens(file);
-
-	if (!dissect_show_all_symbols) {
-		do_sym_list(res);
-		goto end;
-	}
+	if (!dissect_show_all_symbols)
+		return do_sym_list(res);
 
 	DO_LIST(file_scope->symbols, sym,
 		if (input_streams[sym->pos.stream].fd != -1 && valid_namespace(sym->namespace)) {
@@ -706,15 +702,11 @@ static void do_file(char *file)
 			do_symbol(sym);
 		}
 	);
-
-end:
-	/* Drop the tokens for this file after parsing */
-	clear_token_alloc();
 }
 
 void dissect(struct reporter *rep, struct string_list *filelist)
 {
 	reporter = rep;
 
-	DO_LIST(filelist, file, do_file(file));
+	DO_LIST(filelist, file, do_file(__sparse(file)));
 }

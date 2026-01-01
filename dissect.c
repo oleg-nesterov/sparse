@@ -168,9 +168,6 @@ static struct symbol *report_symbol(usage_t mode, struct expression *expr)
 	struct symbol *sym = expr_symbol(expr);
 	struct symbol *ret = base_type(sym);
 
-	if (0 && ret->type == SYM_ENUM)
-		return report_member(mode, &expr->pos, ret, expr->symbol);
-
 	reporter->r_symbol(fix_mode(ret, mode), &expr->pos, sym);
 
 	return ret;
@@ -195,7 +192,7 @@ static bool deanon(struct symbol *base, struct ident *node, struct symbol *paren
 
 static void report_memdef(struct symbol *sym, struct symbol *mem)
 {
-	mem->kind = 'm';
+	mem->kind = sym && sym->type == SYM_ENUM ? 'e' : 'm';
 	if (sym && mem->ident)
 		reporter->r_memdef(sym, mem);
 }
@@ -235,12 +232,12 @@ static void examine_sym_node(struct symbol *node, struct symbol *parent)
 			node = base;
 			break;
 
-		case SYM_STRUCT: case SYM_UNION: //case SYM_ENUM:
+		case SYM_STRUCT: case SYM_UNION: case SYM_ENUM:
 			if (base->inspected)
 				return;
 			base->inspected = 1;
-			base->kind = 's';
 
+			base->kind = base->type == SYM_ENUM ? 'E' : 's';
 			if (!base->symbol_list)
 				return;
 

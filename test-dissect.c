@@ -58,13 +58,16 @@ static void r_symbol(unsigned mode, struct position *pos, struct symbol *sym)
 
 	switch (sym->kind) {
 	case 'd':
+	case 't':
 		break;
+	case 'E':
+		if (sym->type == SYM_ENUM)
+			break;
+		goto err;
 	case 's':
 		if (sym->type == SYM_STRUCT || sym->type == SYM_UNION)
 			break;
 		goto err;
-	case 't':
-		break;
 	case 'f':
 		if (sym->type != SYM_BAD && sym->ctype.base_type->type != SYM_FN)
 			goto err;
@@ -84,6 +87,7 @@ err:
 static void r_member(unsigned mode, struct position *pos, struct symbol *sym, struct symbol *mem)
 {
 	struct ident *ni, *si, *mi;
+	int mk;
 
 	print_usage(pos, sym, mode);
 
@@ -91,15 +95,16 @@ static void r_member(unsigned mode, struct position *pos, struct symbol *sym, st
 	si = sym->ident ?: ni;
 	/* mem == NULL means entire struct accessed */
 	mi = mem ? (mem->ident ?: ni) : built_in_ident("*");
+	mk = mem ? mem->kind : 'm';
 
-	printf("%c m %.*s.%-*.*s %s\n",
-		symscope(sym), si->len, si->name,
+	printf("%c %c %.*s.%-*.*s %s\n",
+		symscope(sym), mk, si->len, si->name,
 		32-1 - si->len, mi->len, mi->name,
 		show_typename(mem ? mem->ctype.base_type : sym));
 
-	if (sym->ident && sym->kind != 's')
+	if (sym->ident && sym->kind != 's' && sym->kind != 'E')
 		warning(*pos, "r_member bad sym type=%d kind=%d", sym->type, sym->kind);
-	if (mem && mem->kind != 'm')
+	if (mem && mem->kind != 'm' && mem->kind != 'e')
 		warning(*pos, "r_member bad mem->kind = %d", mem->kind);
 }
 

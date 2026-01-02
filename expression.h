@@ -167,6 +167,7 @@ struct expression {
 		// EXPR_VALUE
 		struct {
 			unsigned long long value;
+			struct symbol *enum_node;
 			unsigned taint;
 		};
 

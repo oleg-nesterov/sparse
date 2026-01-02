@@ -479,6 +479,9 @@ struct token *primary_expression(struct token *token, struct expression **tree)
 			/* we want the right position reported, thus the copy */
 			expr->pos = token->pos;
 			expr->flags = CEF_SET_ENUM;
+			// enum { X = bad } results in EXPR_SYMBOL
+			if (expr->type == EXPR_VALUE)
+				expr->enum_node = sym;
 			token = next;
 			break;
 		}

@@ -16,7 +16,17 @@ static inline const char *show_mode(unsigned mode)
 	return str;
 }
 
-static void print_usage(struct position *pos, struct symbol *sym, unsigned mode)
+static char symscope(struct symbol *sym)
+{
+	if (sym_is_local(sym)) {
+		if (!dissect_ctx)
+			warning(sym->pos, "no context");
+		return '.';
+	}
+	return ' ';
+}
+
+static void print_usage(struct position *pos, struct symbol *sym, unsigned mode, int kind)
 {
 	static unsigned curr_stream = -1;
 	static struct ident null;
@@ -30,30 +40,21 @@ static void print_usage(struct position *pos, struct symbol *sym, unsigned mode)
 	if (dissect_ctx)
 		ctx = dissect_ctx->ident;
 
-	printf("%4d:%-3d %-16.*s %s ",
-		pos->line, pos->pos, ctx->len, ctx->name, show_mode(mode));
+	printf("%4d:%-3d %-16.*s %s %c %c ",
+		pos->line, pos->pos, ctx->len, ctx->name,
+		show_mode(mode), symscope(sym), kind);
 
-}
-
-static char symscope(struct symbol *sym)
-{
-	if (sym_is_local(sym)) {
-		if (!dissect_ctx)
-			warning(sym->pos, "no context");
-		return '.';
-	}
-	return ' ';
 }
 
 static void r_symbol(unsigned mode, struct position *pos, struct symbol *sym)
 {
-	print_usage(pos, sym, mode);
-
 	if (!sym->ident)
 		sym->ident = built_in_ident("__asm__");
 
-	printf("%c %c %-32.*s %s\n",
-		symscope(sym), sym->kind, sym->ident->len, sym->ident->name,
+	print_usage(pos, sym, mode, sym->kind);
+
+	printf("%-32.*s %s\n",
+		sym->ident->len, sym->ident->name,
 		show_typename(sym->ctype.base_type));
 
 	switch (sym->kind) {
@@ -89,16 +90,16 @@ static void r_member(unsigned mode, struct position *pos, struct symbol *sym, st
 	struct ident *ni, *si, *mi;
 	int mk;
 
-	print_usage(pos, sym, mode);
-
 	ni = built_in_ident("?");
 	si = sym->ident ?: ni;
 	/* mem == NULL means entire struct accessed */
 	mi = mem ? (mem->ident ?: ni) : built_in_ident("*");
 	mk = mem ? mem->kind : 'm';
 
-	printf("%c %c %.*s.%-*.*s %s\n",
-		symscope(sym), mk, si->len, si->name,
+	print_usage(pos, sym, mode, mk);
+
+	printf("%.*s.%-*.*s %s\n",
+		si->len, si->name,
 		32-1 - si->len, mi->len, mi->name,
 		show_typename(mem ? mem->ctype.base_type : sym));
 

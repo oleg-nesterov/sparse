@@ -88,19 +88,20 @@ err:
 static void r_member(unsigned mode, struct position *pos, struct symbol *sym, struct symbol *mem)
 {
 	struct ident *ni, *si, *mi;
-	int mk;
+	int mk, ms = 32;
 
 	ni = built_in_ident("?");
-	si = sym->ident ?: ni;
 	/* mem == NULL means entire struct accessed */
-	mi = mem ? (mem->ident ?: ni) : built_in_ident("*");
 	mk = mem ? mem->kind : 'm';
+	mi = mem ? (mem->ident ?: ni) : built_in_ident("*");
+	si = sym->ident ?: (mk == 'e' ? NULL : ni);
 
 	print_usage(pos, sym, mode, mk);
 
-	printf("%.*s.%-*.*s %s\n",
-		si->len, si->name,
-		32-1 - si->len, mi->len, mi->name,
+	if (si)
+		ms -= printf("%.*s.", si->len, si->name);
+
+	printf("%-*.*s %s\n", ms, mi->len, mi->name,
 		show_typename(mem ? mem->ctype.base_type : sym));
 
 	if (sym->ident && sym->kind != 's' && sym->kind != 'E')

@@ -245,10 +245,11 @@ static void examine_sym_node(struct symbol *node, struct symbol *parent)
 			if (toplevel(base->scope))
 				dissect_ctx = NULL;
 
-			if (base->ident || deanon(base, name, parent))
+			if (base->ident || (!node->enum_member &&
+					    deanon(base, name, parent)))
 				reporter->r_symdef(base);
 
-			if (base->ident)
+			if (base->ident || base->type == SYM_ENUM)
 				parent = base;
 			DO_LIST(base->symbol_list, mem,
 				examine_sym_node(mem, parent);

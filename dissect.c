@@ -630,11 +630,16 @@ static inline bool is_typedef(struct symbol *sym)
 	return (sym->namespace == NS_TYPEDEF);
 }
 
-static struct symbol *do_symbol(struct symbol *sym)
+static struct symbol *do_symbol(struct symbol *__sym)
 {
+	struct symbol *sym = __sym->definition ?: __sym;
 	struct symbol *type = base_type(sym);
 	struct symbol *dctx = dissect_ctx;
 	struct statement *stmt;
+
+	if (sym->inspected)
+		return type;
+	sym->inspected = 1;
 
 	reporter->r_symdef(sym);
 

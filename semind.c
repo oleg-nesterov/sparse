@@ -746,6 +746,9 @@ static void r_member(unsigned mode, struct position *pos, struct symbol *sym, st
 	struct ident *ctx = &null;
 	struct index_record rec;
 
+	if (mem && mem->kind == 'e')
+		return r_symbol(mode, pos, mem);
+
 	update_stream();
 
 	if (semind_streams[pos->stream].id == -1)

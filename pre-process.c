@@ -289,9 +289,12 @@ static struct token *collect_arg(struct token *prev, int vararg, const struct po
 		} else if (match_op(next, ',') && !nesting && !vararg) {
 			break;
 		}
-		next->pos.stream = pos->stream;
-		next->pos.line = pos->line;
-		next->pos.pos = pos->pos;
+		/* See "if (preprocess_only)" in sparse_tokenstream() */
+		if (preprocess_only) {
+			next->pos.stream = pos->stream;
+			next->pos.line = pos->line;
+			next->pos.pos = pos->pos;
+		}
 		next->pos.newline = 0;
 		p = &next->next;
 	}

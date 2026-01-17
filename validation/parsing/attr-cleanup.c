@@ -24,7 +24,7 @@ int test(int n)
  * check-command: sparse -Wunknown-attribute $file
  *
  * check-error-start
-parsing/attr-cleanup.c:10:17: error: argument is not an identifier
+parsing/attr-cleanup.c:10:27: error: argument is not an identifier
 parsing/attr-cleanup.c:11:39: error: an argument is expected for attribute 'cleanup'
 parsing/attr-cleanup.c:12:40: error: an argument is expected for attribute 'cleanup'
 parsing/attr-cleanup.c:13:43: error: Expected ) after attribute's argument'

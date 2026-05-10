@@ -602,6 +602,11 @@ static struct symbol *do_initializer(struct symbol *type, struct expression *exp
 							lookup_member(m_type, m_expr->expr_ident, m_atop));
 					m_expr = m_expr->ident_expression;
 					m_atop = NULL;
+
+					while (m_expr->type == EXPR_INDEX) {
+						m_type = base_type(m_type);
+						m_expr = m_expr->idx_expression;
+					}
 				}
 
 				if (m_atop) {

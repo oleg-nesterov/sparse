@@ -193,8 +193,19 @@ static bool deanon(struct symbol *base, struct ident *node, struct symbol *paren
 static void report_memdef(struct symbol *sym, struct symbol *mem)
 {
 	mem->kind = sym && sym->type == SYM_ENUM ? 'e' : 'm';
-	if (sym && mem->ident)
+	if (!sym)
+		return;
+	else if (mem->ident)
 		reporter->r_memdef(sym, mem);
+	else {
+		struct symbol *base = mem->ctype.base_type;
+		if (base->ident == sym->ident) // deanon()'ed
+			return;
+		// base->inspected is T, we can override ->pos
+		DO_LIST(base->symbol_list, __mem,
+			__mem->pos = mem->pos;
+			report_memdef(sym, __mem));
+	}
 }
 
 static void examine_sym_node(struct symbol *node, struct symbol *parent)

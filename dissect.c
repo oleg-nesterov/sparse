@@ -331,6 +331,13 @@ static struct symbol *lookup_member(struct symbol *type, struct ident *name, int
 	return mem;
 }
 
+static struct symbol *find_report_member(usage_t mode, struct position *pos,
+					 struct symbol *type, struct ident *name,
+					 int *p_addr)
+{
+	return report_member(mode, pos, type, lookup_member(type, name, p_addr));
+}
+
 static struct expression *peek_preop(struct expression *expr, int op)
 {
 	do {
@@ -474,8 +481,8 @@ again:
 			p_mode = U_R_VAL;
 		p_type = do_expression(p_mode, expr->deref);
 
-		ret = report_member(mode, &expr->m_pos, p_type,
-			lookup_member(p_type, expr->member, NULL));
+		ret = find_report_member(mode, &expr->m_pos,
+					 p_type, expr->member, NULL);
 	}
 
 	break; case EXPR_OFFSETOF: {
@@ -483,8 +490,8 @@ again:
 
 		do {
 			if (expr->op == '.') {
-				in = report_member(U_VOID, &expr->pos, in,
-					lookup_member(in, expr->ident, NULL));
+				in = find_report_member(U_VOID, &expr->pos,
+							in, expr->ident, NULL);
 			} else {
 				do_expression(U_R_VAL, expr->index);
 				in = in->ctype.base_type;
@@ -609,8 +616,8 @@ static struct symbol *do_initializer(struct symbol *type, struct expression *exp
 
 				m_type = type;
 				while (m_expr->type == EXPR_IDENTIFIER) {
-					m_type = report_member(U_W_VAL, &m_expr->pos, m_type,
-							lookup_member(m_type, m_expr->expr_ident, m_atop));
+					m_type = find_report_member(U_W_VAL, &m_expr->pos,
+								    m_type, m_expr->expr_ident, m_atop);
 					m_expr = m_expr->ident_expression;
 					m_atop = NULL;
 
@@ -621,8 +628,8 @@ static struct symbol *do_initializer(struct symbol *type, struct expression *exp
 				}
 
 				if (m_atop) {
-					m_type = report_member(U_W_VAL, &m_expr->pos, m_type,
-							lookup_member(m_type, NULL, m_atop));
+					m_type = find_report_member(U_W_VAL, &m_expr->pos,
+								    m_type, NULL, m_atop);
 				}
 
 				if (m_expr->type != EXPR_INITIALIZER)

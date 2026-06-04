@@ -283,7 +283,7 @@ static struct symbol *base_type(struct symbol *sym)
 		?: &bad_ctype;
 }
 
-static struct symbol *__lookup_member(struct symbol *type, struct ident *name, int *p_addr)
+static struct symbol *lookup_member(struct symbol *type, struct ident *name, int *p_addr)
 {
 	struct symbol *node;
 	int addr = 0;
@@ -294,7 +294,7 @@ static struct symbol *__lookup_member(struct symbol *type, struct ident *name, i
 				return node;
 		}
 		else if (node->ident == NULL) {
-			node = __lookup_member(node->ctype.base_type, name, NULL);
+			node = lookup_member(node->ctype.base_type, name, NULL);
 			if (node)
 				goto found;
 		}
@@ -310,9 +310,11 @@ found:
 	return NULL;
 }
 
-static struct symbol *lookup_member(struct symbol *type, struct ident *name, int *addr)
+static struct symbol *find_report_member(usage_t mode, struct position *pos,
+					 struct symbol *type, struct ident *name,
+					 int *p_addr)
 {
-	struct symbol *mem = __lookup_member(type, name, addr);
+	struct symbol *mem = lookup_member(type, name, p_addr);
 
 	if (!mem) {
 		static struct symbol bad_member = {
@@ -328,14 +330,7 @@ static struct symbol *lookup_member(struct symbol *type, struct ident *name, int
 		mem->ident = name;
 	}
 
-	return mem;
-}
-
-static struct symbol *find_report_member(usage_t mode, struct position *pos,
-					 struct symbol *type, struct ident *name,
-					 int *p_addr)
-{
-	return report_member(mode, pos, type, lookup_member(type, name, p_addr));
+	return report_member(mode, pos, type, mem);
 }
 
 static struct expression *peek_preop(struct expression *expr, int op)

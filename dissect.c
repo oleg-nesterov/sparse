@@ -286,7 +286,18 @@ static struct symbol *base_type(struct symbol *sym)
 struct lookup_args {
 	struct ident *name;
 	int *p_addr;
+	struct position pos;
+	struct symbol *stack[8];
+	unsigned int depth;
 };
+
+static inline void lookup_push(struct lookup_args *la, struct symbol *type)
+{
+	if (la->depth == ARRAY_SIZE(la->stack))
+		warning(la->pos, "lookup stack overflow");
+	else
+		la->stack[la->depth++] = type;
+}
 
 static struct symbol *lookup_member(struct symbol *type, struct lookup_args *la)
 {
@@ -299,9 +310,13 @@ static struct symbol *lookup_member(struct symbol *type, struct lookup_args *la)
 				return node;
 		}
 		else if (node->ident == NULL) {
-			node = lookup_member(node->ctype.base_type, la);
-			if (node)
+			struct symbol *base = node->ctype.base_type;
+			node = lookup_member(base, la);
+			if (node) {
+				if (type->ident != base->ident)
+					lookup_push(la, base);
 				goto found;
+			}
 		}
 		else if (node->ident == la->name) {
 found:			if (la->p_addr)
@@ -321,6 +336,8 @@ static struct symbol *find_report_member(usage_t mode, struct position *pos,
 	struct lookup_args la = {
 		.name	= name,
 		.p_addr	= p_addr,
+		.pos	= *pos,
+		.depth	= 0,
 	};
 	struct symbol *mem = lookup_member(type, &la);
 
@@ -337,6 +354,9 @@ static struct symbol *find_report_member(usage_t mode, struct position *pos,
 		mem = &bad_member;
 		mem->ident = name;
 	}
+
+	while (la.depth)
+		report_member(mode, pos, la.stack[--la.depth], mem);
 
 	return report_member(mode, pos, type, mem);
 }

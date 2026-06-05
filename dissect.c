@@ -283,25 +283,29 @@ static struct symbol *base_type(struct symbol *sym)
 		?: &bad_ctype;
 }
 
-static struct symbol *lookup_member(struct symbol *type, struct ident *name, int *p_addr)
+struct lookup_args {
+	struct ident *name;
+	int *p_addr;
+};
+
+static struct symbol *lookup_member(struct symbol *type, struct lookup_args *la)
 {
 	struct symbol *node;
 	int addr = 0;
 
 	FOR_EACH_PTR(type->symbol_list, node)
-		if (!name) {
-			if (addr == *p_addr)
+		if (!la->name) {
+			if (*la->p_addr == addr)
 				return node;
 		}
 		else if (node->ident == NULL) {
-			node = lookup_member(node->ctype.base_type, name, NULL);
+			node = lookup_member(node->ctype.base_type, la);
 			if (node)
 				goto found;
 		}
-		else if (node->ident == name) {
-found:
-			if (p_addr)
-				*p_addr = addr;
+		else if (node->ident == la->name) {
+found:			if (la->p_addr)
+				*la->p_addr = addr;
 			return node;
 		}
 		addr++;
@@ -314,7 +318,11 @@ static struct symbol *find_report_member(usage_t mode, struct position *pos,
 					 struct symbol *type, struct ident *name,
 					 int *p_addr)
 {
-	struct symbol *mem = lookup_member(type, name, p_addr);
+	struct lookup_args la = {
+		.name	= name,
+		.p_addr	= p_addr,
+	};
+	struct symbol *mem = lookup_member(type, &la);
 
 	if (!mem) {
 		static struct symbol bad_member = {

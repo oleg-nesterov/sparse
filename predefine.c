@@ -209,9 +209,8 @@ void predefined_macros(void)
 	predefine("__pragma__", 0, NULL);
 
 	switch (arch_m64) {
-	case ARCH_LP32:
-		break;
 	case ARCH_X32:
+	case ARCH_LP32:
 		predefine("__ILP32__", 1, "1");
 		predefine("_ILP32", 1, "1");
 		break;

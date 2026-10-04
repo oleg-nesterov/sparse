@@ -323,13 +323,9 @@ done:
 		show_usage();
 	}
 
-	// enforce tabstop
-	tabstop = 1;
-
 	// step back since sparse_initialize will ignore argv[0].
 	parsed--;
 	sparse_initialize(argc - parsed, argv + parsed, &semind_filelist);
-	dissect_show_all_symbols = 1;
 }
 
 static void parse_cmdline_rm(int argc, char **argv)
